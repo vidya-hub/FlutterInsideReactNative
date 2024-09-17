@@ -14,9 +14,15 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+flutter_application_path = '../../fluttermodule'
+
+
 target 'rnapp' do
   config = use_native_modules!
-
+  # add below two lines
+  load File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')
+  install_all_flutter_pods(flutter_application_path)
+  #
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.
@@ -24,12 +30,16 @@ target 'rnapp' do
   )
 
   target 'rnappTests' do
+    # add below line
+    install_all_flutter_pods(flutter_application_path)
     inherit! :complete
     # Pods for testing
   end
 
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    # add below line
+    flutter_post_install(installer) if defined?(flutter_post_install)
     react_native_post_install(
       installer,
       config[:reactNativePath],
